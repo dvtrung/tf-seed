@@ -102,3 +102,10 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# custome files and directories
+data/
+saved_models/
+logs/
+.idea/
+.DS_Store

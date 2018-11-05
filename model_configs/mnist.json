@@ -1,0 +1,7 @@
+{
+  "model": "mnist",
+  "dataset": "mnist",
+  "hidden1_units": 128,
+  "hidden2_units": 32,
+  "num_classes": 10
+}
