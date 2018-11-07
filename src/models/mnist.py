@@ -60,7 +60,8 @@ class Model(BaseModel):
     @property
     def predicted_label_placeholder(self): return [self._predicted_labels]
 
-    def get_decode_fns(self):
+    @classmethod
+    def get_decode_fns(cls):
         return [
             lambda d: str(d)
         ]

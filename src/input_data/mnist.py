@@ -9,6 +9,31 @@ import tensorflow as tf
 import numpy as np
 
 
+def read32(bytestream):
+    """Read 4 bytes from bytestream as an unsigned 32-bit integer."""
+    dt = np.dtype(np.uint32).newbyteorder('>')
+    return np.frombuffer(bytestream.read(4), dtype=dt)[0]
+
+
+def download(directory, filename):
+    """Download (and unzip) a file from the MNIST dataset if not already done."""
+    filepath = os.path.join(directory, filename)
+    if tf.gfile.Exists(filepath):
+        return filepath
+    if not tf.gfile.Exists(directory):
+        tf.gfile.MakeDirs(directory)
+    # CVDF mirror of http://yann.lecun.com/exdb/mnist/
+    url = 'https://storage.googleapis.com/cvdf-datasets/mnist/' + filename + '.gz'
+    _, zipped_filepath = tempfile.mkstemp(suffix='.gz')
+    print('Downloading %s to %s' % (url, zipped_filepath))
+    urllib.request.urlretrieve(url, zipped_filepath)
+    with gzip.open(zipped_filepath, 'rb') as f_in, \
+            tf.gfile.Open(filepath, 'wb') as f_out:
+        shutil.copyfileobj(f_in, f_out)
+    os.remove(zipped_filepath)
+    return filepath
+
+
 class InputData(BaseInputData):
     DEFAULT_PARAMS = dict(
         data_path="data/mnist"
@@ -27,8 +52,8 @@ class InputData(BaseInputData):
         else:
             images_file, labels_file = 't10k-images-idx3-ubyte', 't10k-labels-idx1-ubyte'
 
-        self._images_file = self.download(params.data_path, images_file)
-        self._labels_file = self.download(params.data_path, labels_file)
+        self._images_file = download(params.data_path, images_file)
+        self._labels_file = download(params.data_path, labels_file)
 
         self.size = os.path.getsize(os.path.join(params.data_path, labels_file)) - 8
 
@@ -61,26 +86,3 @@ class InputData(BaseInputData):
 
     def reset_iterator(self, sess, skip=0, shuffle=False, bucket_size=None):
         sess.run(self.iterator.initializer)
-
-    def read32(self, bytestream):
-        """Read 4 bytes from bytestream as an unsigned 32-bit integer."""
-        dt = np.dtype(np.uint32).newbyteorder('>')
-        return np.frombuffer(bytestream.read(4), dtype=dt)[0]
-
-    def download(self, directory, filename):
-        """Download (and unzip) a file from the MNIST dataset if not already done."""
-        filepath = os.path.join(directory, filename)
-        if tf.gfile.Exists(filepath):
-            return filepath
-        if not tf.gfile.Exists(directory):
-            tf.gfile.MakeDirs(directory)
-        # CVDF mirror of http://yann.lecun.com/exdb/mnist/
-        url = 'https://storage.googleapis.com/cvdf-datasets/mnist/' + filename + '.gz'
-        _, zipped_filepath = tempfile.mkstemp(suffix='.gz')
-        print('Downloading %s to %s' % (url, zipped_filepath))
-        urllib.request.urlretrieve(url, zipped_filepath)
-        with gzip.open(zipped_filepath, 'rb') as f_in, \
-                tf.gfile.Open(filepath, 'wb') as f_out:
-            shutil.copyfileobj(f_in, f_out)
-        os.remove(zipped_filepath)
-        return filepath

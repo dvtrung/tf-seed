@@ -106,25 +106,16 @@ def read_configs(flags):
     hparams = tf.contrib.training.HParams(
         model=_argval('model'),
         dataset=_argval('dataset'),
-        input_unit=_argval('input_unit'),
         verbose=_argval('verbose') or False,
 
         batch_size=_argval('batch_size') or 32,
         eval_batch_size=_argval('eval_batch_size') or _argval('batch_size') or 32,
-        num_buckets=5,
         max_epoch_num=30,
 
         epoch_step=0,
 
         summaries_dir=None,
         out_dir=None,
-        beam_width=4,
-        sampling_temperature=0.0,
-        num_units=320,
-        num_encoder_layers=3,
-        num_decoder_layers=1,
-        vocab_size=0,
-        num_features=120,
 
         colocate_gradients_with_ops=True,
 
@@ -134,17 +125,6 @@ def read_configs(flags):
         dropout=0.2,
 
         # Data
-        vocab_file=None,
-        train_data=None,
-        predicted_train_data=None,
-        predicted_dev_data=None,
-        predicted_test_data=None,
-        test_data=None,
-        dev_data=None,
-        train_size=None,
-        eval_size=None,
-        load_voice=True,
-        encoding="euc-jp",
         output_result=_argval("output") or False,
         result_output_file=None,
         result_output_folder=None,
